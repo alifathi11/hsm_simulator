@@ -9,17 +9,19 @@
 
 
 class ISO8583Encoder {
+
 public:
     static std::string encodeMTI(const std::string& mti);
     static std::string buildBitmap(const std::map<int, std::string>& fields);
     static std::string encodeFixed(const std::string& value, size_t length);
     static std::string encodeLLVAR(const std::string& value);
     static std::string encodeLLLVAR(const std::string& value);
+    static std::string encodeBCD(const std::string& value);
 
     static std::string encodePAN(const std::string& pan);
     static std::string encodeProcessingCode(const std::string& code);
     static std::string encodeAmount(const std::string& amount);
-    static std::string encodeTransmissionDateTime(const std::string& dt);
+    static std::string encodeTransmissionDateTime();
     static std::string encodeSTAN(const std::string& stan);
     static std::string encodeTimeLocal(const std::string& time);
     static std::string encodeDateLocal(const std::string& date);

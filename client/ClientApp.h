@@ -4,12 +4,13 @@
 
 
 class ClientApp {
+
 public:
     void run();
 
 private:
     void showMenu();
-    void handleOption(const std::string&)
+    void handleOption(const std::string&);
     void showMessage(std::string);
     void endProgram();
 };

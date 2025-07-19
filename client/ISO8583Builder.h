@@ -4,6 +4,7 @@
 
 
 class ISO8583Builder {
+
 public:
     std::string buildVerifyCVV2(const std::string& pan, const std::string& cvv2, const std::string& exp);
     std::string buildVerifyPVV(const std::string& pan, const std::string& pvv);

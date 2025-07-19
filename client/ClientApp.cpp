@@ -39,7 +39,7 @@ void ClientApp::handleOption(const std::string &option) {
 
     switch (optionNumber) {
         case 1:
-            handlers.handleVerifyCVV2();
+            handleVerifyCVV2();
             break;
         case 2:
             handleVerifyPVV();
