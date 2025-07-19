@@ -10,42 +10,32 @@
 
 
 std::string ISO8583Encoder::buildBitmap(const std::map<int, std::string> &fields) {
-
-    // find maximum field number
-    int maxFiledNumber = 0;
+    int maxFieldNumber = 0;
     for (const auto& [fieldNumber, _] : fields) {
-        if (fieldNumber > maxFiledNumber) maxFiledNumber = fieldNumber;
+        if (fieldNumber > maxFieldNumber) maxFieldNumber = fieldNumber;
     }
 
-    int bitmapSize = maxFiledNumber > 64 ? 128 : 64;
+    int bitmapSize = maxFieldNumber > 64 ? 128 : 64;
+    std::string bitmap(bitmapSize / 8, '\0');
 
-    // make binary string
-    std::string binary(bitmapSize, '0');
-
-    // active the second bitmap
-    if (bitmapSize == 128) binary[0] = '1';
+    if (bitmapSize == 128) {
+        bitmap[0] = 0x80;
+    }
 
     for (const auto& [fieldNumber, _] : fields) {
         if (fieldNumber < 1 || fieldNumber > 128) {
             throw std::invalid_argument("Invalid field number");
         }
-
-        binary[fieldNumber - 1] = '1';
+        int bitIndex = fieldNumber - 1;
+        int byteIndex = bitIndex / 8;
+        int bitInByte = 7 - (bitIndex % 8);
+        bitmap[byteIndex] |= (1 << bitInByte);
     }
 
-    // make HEX bitmap
-    std::string hexBitmap;
-
-    // convert binary to HEX
-    for (int i = 0; i < binary.size(); i += 4) {
-        std::string nibble = binary.substr(i, 4);
-        hexBitmap += "0123456789ABCDEF"[std::stoi(nibble, nullptr, 2)];
-    }
-
-    return hexBitmap;
+    return bitmap;
 }
 
-std::string ISO8583Encoder::encodeLLVAR(const std::string &value) {
+std::string ISO8583Encoder::encodeLLVAR(const std::string& value) {
 
     // get the size of the value string
     int size = value.size();
@@ -64,7 +54,7 @@ std::string ISO8583Encoder::encodeLLVAR(const std::string &value) {
 
 }
 
-std::string ISO8583Encoder::encodeLLLVAR(const std::string &value) {
+std::string ISO8583Encoder::encodeLLLVAR(const std::string& value) {
 
     // get the size of the value string
     int size = value.size();
@@ -83,7 +73,7 @@ std::string ISO8583Encoder::encodeLLLVAR(const std::string &value) {
 
 }
 
-std::string ISO8583Encoder::encodeFixed(const std::string &value, size_t length) {
+std::string ISO8583Encoder::encodeFixed(const std::string& value, size_t length) {
 
     size_t size = value.size();
 
@@ -106,7 +96,7 @@ std::string ISO8583Encoder::encodeFixed(const std::string &value, size_t length)
 
 }
 
-std::string ISO8583Encoder::encodeBCD(const std::string &digits) {
+std::string ISO8583Encoder::encodeBCD(const std::string& digits) {
 
     // leading 0 padding
     std::string padded = digits;
@@ -133,7 +123,7 @@ std::string ISO8583Encoder::encodeBCD(const std::string &digits) {
 
 }
 
-std::string ISO8583Encoder::encodeMTI(const std::string &mti) {
+std::string ISO8583Encoder::encodeMTI(const std::string& mti) {
 
     if (mti.size() != 4 || !std::all_of(mti.begin(), mti.end(), ::isdigit)) {
         throw std::invalid_argument("MTI must be exactly 4 numeric digits");
@@ -142,7 +132,7 @@ std::string ISO8583Encoder::encodeMTI(const std::string &mti) {
     return encodeBCD(mti);
 }
 
-std::string ISO8583Encoder::encodePAN(const std::string &pan) {
+std::string ISO8583Encoder::encodePAN(const std::string& pan) {
 
     if (pan.size() != 16 || !std::all_of(pan.begin(), pan.end(), ::isdigit)) {
         throw std::invalid_argument("PAN must be exactly 16 numeric digits");
@@ -151,7 +141,7 @@ std::string ISO8583Encoder::encodePAN(const std::string &pan) {
     return encodeLLVAR(pan);
 }
 
-std::string ISO8583Encoder::encodeProcessingCode(const std::string &code) {
+std::string ISO8583Encoder::encodeProcessingCode(const std::string& code) {
 
     if (!std::all_of(code.begin(), code.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in processing code");
@@ -160,7 +150,7 @@ std::string ISO8583Encoder::encodeProcessingCode(const std::string &code) {
     return encodeFixed(code, 6);
 }
 
-std::string ISO8583Encoder::encodeSTAN(const std::string &stan) {
+std::string ISO8583Encoder::encodeSTAN(const std::string& stan) {
 
     if (!std::all_of(stan.begin(), stan.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in STAN");
@@ -170,7 +160,7 @@ std::string ISO8583Encoder::encodeSTAN(const std::string &stan) {
 
 }
 
-std::string ISO8583Encoder::encodePOSentryMode(const std::string &mode) {
+std::string ISO8583Encoder::encodePOSentryMode(const std::string& mode) {
 
     if (!std::all_of(mode.begin(), mode.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in pos entry mode");
@@ -180,7 +170,7 @@ std::string ISO8583Encoder::encodePOSentryMode(const std::string &mode) {
 
 }
 
-std::string ISO8583Encoder::encodePOSConditionCode(const std::string &conditionCode) {
+std::string ISO8583Encoder::encodePOSConditionCode(const std::string& conditionCode) {
 
     if (!std::all_of(conditionCode.begin(), conditionCode.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in pos condition code");
@@ -189,7 +179,7 @@ std::string ISO8583Encoder::encodePOSConditionCode(const std::string &conditionC
     return encodeFixed(conditionCode, 2);
 }
 
-std::string ISO8583Encoder::encodeTrack2Data(const std::string &data) {
+std::string ISO8583Encoder::encodeTrack2Data(const std::string& data) {
 
     if (!std::all_of(data.begin(), data.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in track2data");
@@ -203,27 +193,27 @@ std::string ISO8583Encoder::encodeTrack2Data(const std::string &data) {
 
 }
 
-std::string ISO8583Encoder::encodeTerminalID(const std::string &tid) {
+std::string ISO8583Encoder::encodeTerminalID(const std::string& tid) {
     return encodeFixed(tid, 8);
 }
 
-std::string ISO8583Encoder::encodeCAIDC(const std::string &code) {
+std::string ISO8583Encoder::encodeCAIDC(const std::string& code) {
     return encodeFixed(code, 15);
 }
 
-std::string ISO8583Encoder::encodeAdditionalDataPrivate(const std::string &data) {
+std::string ISO8583Encoder::encodeAdditionalDataPrivate(const std::string& data) {
     return encodeLLLVAR(data);
 }
 
-std::string ISO8583Encoder::encodeCurrencyCode(const std::string &code) {
+std::string ISO8583Encoder::encodeCurrencyCode(const std::string& code) {
     return encodeFixed(code, 3);
 }
 
-std::string ISO8583Encoder::encodeFunctionCode(const std::string &code) {
+std::string ISO8583Encoder::encodeFunctionCode(const std::string& code) {
     return encodeFixed(code, 3);
 }
 
-std::string ISO8583Encoder::encodePINBlock(const std::string &pinBlock) {
+std::string ISO8583Encoder::encodePINBlock(const std::string& pinBlock) {
     if (pinBlock.size() != 16) {
         throw std::invalid_argument("PIN block must be exactly 16 hex characters (8 bytes)");
     }
@@ -243,7 +233,7 @@ std::string ISO8583Encoder::encodePINBlock(const std::string &pinBlock) {
     return result;
 }
 
-std::string ISO8583Encoder::encodeAmount(const std::string &amount) {
+std::string ISO8583Encoder::encodeAmount(const std::string& amount) {
     if (!std::all_of(amount.begin(), amount.end(), ::isdigit)) {
         throw std::invalid_argument("Amount must be numeric");
     }
@@ -253,7 +243,7 @@ std::string ISO8583Encoder::encodeAmount(const std::string &amount) {
     return encodeBCD(padded);
 }
 
-std::string ISO8583Encoder::encodeDateLocal(const std::string &date) {
+std::string ISO8583Encoder::encodeDateLocal(const std::string& date) {
     if (date.size() != 4 || !std::all_of(date.begin(), date.end(), ::isdigit)) {
         throw std::invalid_argument("Local date must be in MMDD format");
     }
@@ -261,7 +251,7 @@ std::string ISO8583Encoder::encodeDateLocal(const std::string &date) {
     return encodeBCD(date);
 }
 
-std::string ISO8583Encoder::encodeNII(const std::string &nii) {
+std::string ISO8583Encoder::encodeNII(const std::string& nii) {
     if (nii.size() != 3 || !std::all_of(nii.begin(), nii.end(), ::isdigit)) {
         throw std::invalid_argument("NII must be exactly 3 digits");
     }
@@ -269,7 +259,7 @@ std::string ISO8583Encoder::encodeNII(const std::string &nii) {
     return encodeBCD(nii);
 }
 
-std::string ISO8583Encoder::encodeExpirationDate(const std::string &date) {
+std::string ISO8583Encoder::encodeExpirationDate(const std::string& date) {
     if (date.size() != 4 || !std::all_of(date.begin(), date.end(), ::isdigit)) {
         throw std::invalid_argument("Expiration date must be in YYMM format");
     }
@@ -281,7 +271,7 @@ std::string ISO8583Encoder::encodeMerchantID(const std::string& mid) {
     return encodeFixed(mid, 15);
 }
 
-std::string ISO8583Encoder::encodeTimeLocal(const std::string &time) {
+std::string ISO8583Encoder::encodeTimeLocal(const std::string& time) {
     if (time.size() != 6 || !std::all_of(time.begin(), time.end(), ::isdigit)) {
         throw std::invalid_argument("Local time must be in hhmmss format");
     }

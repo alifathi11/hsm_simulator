@@ -2,15 +2,18 @@
 #define ISO8583BUILDER_H
 #include <string>
 
+#include "ISO8583Message.h"
+#include "ISO8583Request.h"
+
 
 class ISO8583Builder {
 
 public:
-    std::string buildVerifyCVV2(const std::string& pan, const std::string& cvv2, const std::string& exp);
-    std::string buildVerifyPVV(const std::string& pan, const std::string& pvv);
-    std::string buildEncryptُData(const std::string& data);
-    std::string buildGenerateMAC(const std::string& data);
-    std::string buildVerifyMAC(const std::string& data, const std::string& mac);
+    ISO8583Message buildVerifyCVV2(const ISO8583Request &request);
+    ISO8583Message buildVerifyPVV(const ISO8583Request &request);
+    ISO8583Message buildEncryptُData(const ISO8583Request &request);
+    ISO8583Message buildGenerateMAC(const ISO8583Request &request);
+    ISO8583Message buildVerifyMAC(const ISO8583Request &request);
 };
 
 

@@ -3,6 +3,8 @@
 #include <string>
 #include <bits/ostream.tcc>
 
+#include "HSMClient.h"
+#include "Utils.h"
 
 void ClientApp::showMenu() {
     std::cout << "===== HSM Client =====" << std::endl;
@@ -31,41 +33,35 @@ void ClientApp::handleOption(const std::string &option) {
     try {
         optionNumber = std::stoi(option);
     } catch (const std::exception& e) {
-        showMessage("\nPlease enter a valid number.\n");
+        Utils::showMessage("\nPlease enter a valid number.\n");
         return;
     }
 
-
+    HSMClient client;
 
     switch (optionNumber) {
         case 1:
-            handleVerifyCVV2();
+            client.verifyCVV2();
             break;
         case 2:
-            handleVerifyPVV();
+            client.verifyPVV();
             break;
         case 3:
-            handleEncrypt();
+            client.encryptData();
             break;
         case 4:
-            handleGenerateMAC();
+            client.generateMAC();
             break;
         case 5:
-            handleVerifyMAC();
+            client.verifyMAC();
             break;
         case 6:
             endProgram();
             break;
         default:
-            showMessage("\nPlease enter a valid number.\n");
+            Utils::showMessage("\nPlease enter a valid number.\n");
     }
 
-}
-
-
-
-void ClientApp::showMessage(std::string message) {
-    std::cout << message << std::endl;
 }
 
 

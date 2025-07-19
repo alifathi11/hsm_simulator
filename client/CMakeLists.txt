@@ -7,4 +7,8 @@ add_executable(client main.cpp
         ClientApp.cpp
         ISO8583Builder.cpp
         ISO8583Encoder.cpp
-        ISO8583Message.cpp)
+        ISO8583Message.cpp
+        HSMClient.cpp
+        FieldMapper.cpp
+        ISO8583InputManager.cpp
+        Utils.cpp)

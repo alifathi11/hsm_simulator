@@ -5,11 +5,11 @@
 #include "ISO8583Encoder.h"
 
 
-void ISO8583Message::setMTI(const std::string &mti) {
+void ISO8583Message::setMTI(const std::string& mti) {
     this->mti = mti;
 }
 
-void ISO8583Message::setField(int fieldNumber, const std::string &value) {
+void ISO8583Message::setField(int fieldNumber, const std::string& value) {
     this->fields[fieldNumber] = value;
 }
 
@@ -38,12 +38,12 @@ std::string ISO8583Message::pack() {
 }
 
 
-std::map<int, std::string> ISO8583Message::unpack(const std::string &) {
+std::map<int, std::string> ISO8583Message::unpack(const std::string& ) {
 
 }
 
 
-std::string ISO8583Message::encodeField(int fieldNumber, const std::string &value) {
+std::string ISO8583Message::encodeField(int fieldNumber, const std::string& value) {
     switch (fieldNumber) {
         case 2:  return ISO8583Encoder::encodePAN(value);
         case 3:  return ISO8583Encoder::encodeProcessingCode(value);
