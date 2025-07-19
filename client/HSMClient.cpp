@@ -22,8 +22,14 @@ void HSMClient::verifyCVV2() {
     std::string packedMessage = message.pack();
 
     // send to HSM server
+	if (!socket.isConnected()) {
+		socket.connectToServer();
+	}
 
+	socket.sendMessage(packedMessage);
 
+	// receive server response
+	std::string response = socket.receiveMessage();
 }
 
 void HSMClient::verifyPVV() {
@@ -39,7 +45,14 @@ void HSMClient::verifyPVV() {
     std::string packedMessage = message.pack();
 
     // send to HSM server
+	if (!socket.isConnected()) {
+		socket.connectToServer();
+	}
 
+	socket.sendMessage(packedMessage);
+
+	// receive server response
+	std::string response = socket.receiveMessage();
 
 }
 
@@ -56,6 +69,14 @@ void HSMClient::encryptData() {
     std::string packedMessage = message.pack();
 
     // send to HSM server
+	if (!socket.isConnected()) {
+		socket.connectToServer();
+	}
+
+	socket.sendMessage(packedMessage);
+
+	// receive server response
+	std::string response = socket.receiveMessage();
 
 
 }
@@ -73,6 +94,14 @@ void HSMClient::generateMAC() {
     std::string packedMessage = message.pack();
 
     // send to HSM server
+	if (!socket.isConnected()) {
+		socket.connectToServer();
+	}
+
+	socket.sendMessage(packedMessage);
+
+	// receive server response
+	std::string response = socket.receiveMessage();
 }
 
 void HSMClient::verifyMAC() {
@@ -88,5 +117,13 @@ void HSMClient::verifyMAC() {
     std::string packedMessage = message.pack();
 
     // send to HSM server
+	if (!socket.isConnected()) {
+		socket.connectToServer();
+	}
+
+	socket.sendMessage(packedMessage);
+
+	// receive server response
+	std::string response = socket.receiveMessage();
 
 }

@@ -1,5 +1,7 @@
 #include "ISO8583Encoder.h"
 
+#include <algorithm>
+#include <cstdint>
 #include <format>
 #include <iomanip>
 #include <iostream>
@@ -82,7 +84,7 @@ std::string ISO8583Encoder::encodeFixed(const std::string& value, size_t length)
                                     ") exceeds fixed length of " + std::to_string(length));
     }
 
-    bool isNumber = std::all_of(value.begin(), value.end(), ::isdigit);
+    bool isNumber = all_of(value.begin(), value.end(), ::isdigit);
 
     std::ostringstream oss;
 
@@ -125,7 +127,7 @@ std::string ISO8583Encoder::encodeBCD(const std::string& digits) {
 
 std::string ISO8583Encoder::encodeMTI(const std::string& mti) {
 
-    if (mti.size() != 4 || !std::all_of(mti.begin(), mti.end(), ::isdigit)) {
+    if (mti.size() != 4 || !all_of(mti.begin(), mti.end(), ::isdigit)) {
         throw std::invalid_argument("MTI must be exactly 4 numeric digits");
     }
 
@@ -134,7 +136,7 @@ std::string ISO8583Encoder::encodeMTI(const std::string& mti) {
 
 std::string ISO8583Encoder::encodePAN(const std::string& pan) {
 
-    if (pan.size() != 16 || !std::all_of(pan.begin(), pan.end(), ::isdigit)) {
+    if (pan.size() != 16 || !all_of(pan.begin(), pan.end(), ::isdigit)) {
         throw std::invalid_argument("PAN must be exactly 16 numeric digits");
     }
 
@@ -143,7 +145,7 @@ std::string ISO8583Encoder::encodePAN(const std::string& pan) {
 
 std::string ISO8583Encoder::encodeProcessingCode(const std::string& code) {
 
-    if (!std::all_of(code.begin(), code.end(), ::isdigit)) {
+    if (!all_of(code.begin(), code.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in processing code");
     }
 
@@ -152,7 +154,7 @@ std::string ISO8583Encoder::encodeProcessingCode(const std::string& code) {
 
 std::string ISO8583Encoder::encodeSTAN(const std::string& stan) {
 
-    if (!std::all_of(stan.begin(), stan.end(), ::isdigit)) {
+    if (!all_of(stan.begin(), stan.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in STAN");
     }
 
@@ -162,7 +164,7 @@ std::string ISO8583Encoder::encodeSTAN(const std::string& stan) {
 
 std::string ISO8583Encoder::encodePOSentryMode(const std::string& mode) {
 
-    if (!std::all_of(mode.begin(), mode.end(), ::isdigit)) {
+    if (!all_of(mode.begin(), mode.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in pos entry mode");
     }
 
@@ -172,7 +174,7 @@ std::string ISO8583Encoder::encodePOSentryMode(const std::string& mode) {
 
 std::string ISO8583Encoder::encodePOSConditionCode(const std::string& conditionCode) {
 
-    if (!std::all_of(conditionCode.begin(), conditionCode.end(), ::isdigit)) {
+    if (!all_of(conditionCode.begin(), conditionCode.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in pos condition code");
     }
 
@@ -181,7 +183,7 @@ std::string ISO8583Encoder::encodePOSConditionCode(const std::string& conditionC
 
 std::string ISO8583Encoder::encodeTrack2Data(const std::string& data) {
 
-    if (!std::all_of(data.begin(), data.end(), ::isdigit)) {
+    if (!all_of(data.begin(), data.end(), ::isdigit)) {
         throw std::invalid_argument("non-digit character in track2data");
     }
 
@@ -219,7 +221,7 @@ std::string ISO8583Encoder::encodePINBlock(const std::string& pinBlock) {
     }
 
     // validate hex content
-    if (!std::all_of(pinBlock.begin(), pinBlock.end(), ::isxdigit)) {
+    if (!all_of(pinBlock.begin(), pinBlock.end(), ::isxdigit)) {
         throw std::invalid_argument("PIN block contains non-hex characters");
     }
 
@@ -234,7 +236,7 @@ std::string ISO8583Encoder::encodePINBlock(const std::string& pinBlock) {
 }
 
 std::string ISO8583Encoder::encodeAmount(const std::string& amount) {
-    if (!std::all_of(amount.begin(), amount.end(), ::isdigit)) {
+    if (!all_of(amount.begin(), amount.end(), ::isdigit)) {
         throw std::invalid_argument("Amount must be numeric");
     }
 
@@ -244,7 +246,7 @@ std::string ISO8583Encoder::encodeAmount(const std::string& amount) {
 }
 
 std::string ISO8583Encoder::encodeDateLocal(const std::string& date) {
-    if (date.size() != 4 || !std::all_of(date.begin(), date.end(), ::isdigit)) {
+    if (date.size() != 4 || !all_of(date.begin(), date.end(), ::isdigit)) {
         throw std::invalid_argument("Local date must be in MMDD format");
     }
 
@@ -252,7 +254,7 @@ std::string ISO8583Encoder::encodeDateLocal(const std::string& date) {
 }
 
 std::string ISO8583Encoder::encodeNII(const std::string& nii) {
-    if (nii.size() != 3 || !std::all_of(nii.begin(), nii.end(), ::isdigit)) {
+    if (nii.size() != 3 || !all_of(nii.begin(), nii.end(), ::isdigit)) {
         throw std::invalid_argument("NII must be exactly 3 digits");
     }
 
@@ -260,7 +262,7 @@ std::string ISO8583Encoder::encodeNII(const std::string& nii) {
 }
 
 std::string ISO8583Encoder::encodeExpirationDate(const std::string& date) {
-    if (date.size() != 4 || !std::all_of(date.begin(), date.end(), ::isdigit)) {
+    if (date.size() != 4 || !all_of(date.begin(), date.end(), ::isdigit)) {
         throw std::invalid_argument("Expiration date must be in YYMM format");
     }
 
@@ -272,7 +274,7 @@ std::string ISO8583Encoder::encodeMerchantID(const std::string& mid) {
 }
 
 std::string ISO8583Encoder::encodeTimeLocal(const std::string& time) {
-    if (time.size() != 6 || !std::all_of(time.begin(), time.end(), ::isdigit)) {
+    if (time.size() != 6 || !all_of(time.begin(), time.end(), ::isdigit)) {
         throw std::invalid_argument("Local time must be in hhmmss format");
     }
 
@@ -280,7 +282,7 @@ std::string ISO8583Encoder::encodeTimeLocal(const std::string& time) {
 }
 
 std::string ISO8583Encoder::encodeMAC(const std::string& mac) {
-    if (mac.size() != 16 || !std::all_of(mac.begin(), mac.end(), ::isxdigit)) {
+    if (mac.size() != 16 || !all_of(mac.begin(), mac.end(), ::isxdigit)) {
         throw std::invalid_argument("MAC must be 8-byte hex (16 hex chars)");
     }
 
