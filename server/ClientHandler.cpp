@@ -76,7 +76,7 @@ bool ClientHandler::sendResponse(const std::string& response) {
         ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);
         // check if the socket is connected
         if (sent <= 0) {
-            perror("send");
+            Utils::showError("error sending response");
             return false;
         }
         // update total sent bytes
