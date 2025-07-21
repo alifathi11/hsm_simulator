@@ -30,6 +30,9 @@ void HSMClient::verifyCVV2() {
 
 	// receive server response
 	std::string response = socket.receiveMessage();
+
+	// show server response
+	hsmResponse.showResponse(response);
 }
 
 void HSMClient::verifyPVV() {
@@ -53,6 +56,9 @@ void HSMClient::verifyPVV() {
 
 	// receive server response
 	std::string response = socket.receiveMessage();
+
+	// show server response
+	hsmResponse.showResponse(response);
 
 }
 
@@ -78,6 +84,8 @@ void HSMClient::encryptData() {
 	// receive server response
 	std::string response = socket.receiveMessage();
 
+	// show server response
+	hsmResponse.showResponse(response);
 
 }
 
@@ -102,6 +110,9 @@ void HSMClient::generateMAC() {
 
 	// receive server response
 	std::string response = socket.receiveMessage();
+
+	// show server response
+	hsmResponse.showResponse(response);
 }
 
 void HSMClient::verifyMAC() {
@@ -126,4 +137,6 @@ void HSMClient::verifyMAC() {
 	// receive server response
 	std::string response = socket.receiveMessage();
 
+	// show server response
+	hsmResponse.showResponse(response);
 }
