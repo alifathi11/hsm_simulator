@@ -9,7 +9,7 @@ add_executable(client main.cpp
         ISO8583Encoder.cpp
         ISO8583Message.cpp
         HSMClient.cpp
-        FieldMapper.cpp
+        ../server/FieldMapper.cpp
         ISO8583InputManager.cpp
         Utils.cpp
         HSMClientSocket.cpp)

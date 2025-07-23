@@ -29,7 +29,7 @@ void HSMServer::setupSocket() {
     // set SO_REUSEADDR option
     int opt = 1;
     if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        Utils::showError("setsockopt failed");
+        Utils::showError("setsokopt failed");
         exit(EXIT_FAILURE);
     }
 

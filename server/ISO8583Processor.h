@@ -12,12 +12,10 @@ public:
     std::string process();
 
 private:
-    std::string messageStr;
+    std::string rawMessage;
 
-    // TODO: build ISO8583Message out of the string message
     ISO8583Message buildISO8583Message();
-    // TODO: process the ISO8583Message and make the response
-    std::string handleISO8583Message(const ISO8583Message& iso8583Message);
+    std::string handleISO8583Message(ISO8583Message iso8583Message);
 };
 
 

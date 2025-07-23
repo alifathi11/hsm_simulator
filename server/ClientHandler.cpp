@@ -17,7 +17,7 @@ void ClientHandler::operator()() {
     while (true) {
 
         // get the client(switch) ISO8583 message
-        auto msgOpt = recieveMessage();
+        auto msgOpt = receiveMessage();
 
         // check if the client is connected
         if (!msgOpt.has_value()) {

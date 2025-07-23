@@ -3,6 +3,7 @@
 int FieldMapper::getFieldNumber(const std::string& fieldName) {
     static const std::unordered_map<std::string, int> fieldMap = {
         {"pan", 2},               // DE2 - Primary Account Number
+        {"processingCode", 3},    // DE3 - processing code
         {"exp", 14},              // DE14 - Expiry Date (YYMM)
         {"cvv2", 48},             // DE48 - Additional Data (Private Use)
         {"pvv", 48},              // DE48 too (you could separate it by subfields)
