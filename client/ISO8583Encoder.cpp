@@ -136,8 +136,8 @@ std::string ISO8583Encoder::encodeMTI(const std::string& mti) {
 
 std::string ISO8583Encoder::encodePAN(const std::string& pan) {
 
-    if (pan.size() != 16 || !all_of(pan.begin(), pan.end(), ::isdigit)) {
-        throw std::invalid_argument("PAN must be exactly 16 numeric digits");
+    if (pan.size() < 13 || pan.size() > 19 || !all_of(pan.begin(), pan.end(), ::isdigit)) {
+        throw std::invalid_argument("PAN must be 13-19 numeric digits");
     }
 
     return encodeLLVAR(pan);

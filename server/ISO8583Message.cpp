@@ -61,15 +61,23 @@ std::map<int, std::string> ISO8583Message::unpack(const std::string& rawMessage)
     // decode MTI
     mti = ISO8583Decoder::decodeMTI(encodedMTI);
 
-    // extract bitmap hex
-    std::string bitmapHEX = rawMessage.substr(offset, 16);
-    offset += 16;
+    // extract 8 bytes of raw bitmap
+    std::string rawBitmap = rawMessage.substr(offset, 8);
+    offset += 8;
 
-    // parse bitmap
-    std::bitset<64> bitmap = ISO8583Decoder::parseBitmap(bitmapHEX);
+    // extract bitmap
+    std::bitset<128> bitmap = ISO8583Decoder::parseBitmap(rawBitmap);
+
+    // If bit 1 is set, it's a 128-bit bitmap, so read 8 more bytes
+    if (bitmap[0]) {
+        std::string secondaryBitmap = rawMessage.substr(offset, 8);
+        offset += 8;
+        rawBitmap += secondaryBitmap;
+        bitmap = ISO8583Decoder::parseBitmap(rawBitmap);
+    }
 
     // extract and decode fields
-    for (int fieldNumber = 2; fieldNumber <= 64; fieldNumber++) {
+    for (int fieldNumber = 2; fieldNumber <= bitmap.size(); fieldNumber++) {
         if (bitmap.test(fieldNumber - 1)) {
             std::string rawValue = extractValue(fieldNumber, rawMessage, offset);
             std::string decodedValue = decodeField(fieldNumber, rawValue);

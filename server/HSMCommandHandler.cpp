@@ -1,6 +1,6 @@
 #include "HSMCommandHandler.h"
 
-#include "FieldMapper.h"
+#include "../common/FieldMapper.h"
 #include "ISO8583Message.h"
 #include "SecurityService.h"
 

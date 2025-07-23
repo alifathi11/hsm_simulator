@@ -1,6 +1,6 @@
 #include "ISO8583Builder.h"
 
-#include "FieldMapper.h"
+#include "../common/FieldMapper.h"
 
 
 ISO8583Message ISO8583Builder::buildVerifyCVV2(const ISO8583Request &request) {
