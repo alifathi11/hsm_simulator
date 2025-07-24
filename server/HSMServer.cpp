@@ -7,14 +7,16 @@
 #include <thread>
 #include <unistd.h>
 #include <cstring>
+#include <memory>
 #include <netinet/in.h>
+#include <openssl/err.h>
 #include <sys/socket.h>
 
 #include "ClientHandler.h"
-#include "Utils.h"
+#include "../common/Utils.h"
 
 
-HSMServer::HSMServer(int port) : port(port) {}
+HSMServer::HSMServer(int port, SSLContext& sslContext) : port(port), sslContext(sslContext) {}
 
 
 void HSMServer::setupSocket() {
@@ -51,6 +53,7 @@ void HSMServer::setupSocket() {
         exit(EXIT_FAILURE);
     }
 
+
     Utils::showMessage("Server started listening on port " + std::to_string(port));
 }
 
@@ -61,7 +64,6 @@ void HSMServer::start() {
     isRunning = true;
 
     while (isRunning) {
-
         sockaddr_in clientAddress{};
         socklen_t clientAddressLength = sizeof(clientAddress);
 
@@ -71,9 +73,23 @@ void HSMServer::start() {
             continue;
         }
 
+        SSL* ssl = SSL_new(sslContext.getContext());
+        SSL_set_fd(ssl, clientSocket);
+
+        if (SSL_accept(ssl) <= 0) {
+            // handshake failed
+            ERR_print_errors_fp(stderr);
+            SSL_free(ssl);
+            close(clientSocket);
+            continue;
+        }
+
         Utils::showMessage("Client connected on socket: " + std::to_string(clientSocket));
 
-        std::thread(ClientHandler(clientSocket)).detach();
+        auto handler = std::make_shared<ClientHandler>(ssl);
+        std::thread([handler]() {
+            (*handler)();
+        }).detach();
     }
 
     close(serverSocket);

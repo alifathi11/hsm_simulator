@@ -61,7 +61,7 @@ std::string ISO8583Decoder::decodeLLLVAR(const std::string& data) {
     return data.substr(3, length);
 }
 
-std::string decodeFixed(const std::string& data, size_t length) {
+std::string ISO8583Decoder::decodeFixed(const std::string &data, size_t length) {
     if (data.size() != length) {
         throw std::invalid_argument("Fixed field length mismatch");
     }
@@ -73,6 +73,7 @@ std::string decodeFixed(const std::string& data, size_t length) {
 
     return data.substr(0, data.find_last_not_of(' ') + 1);
 }
+
 
 std::string ISO8583Decoder::decodeBCD(const std::string& bcd) {
     std::string digits;
@@ -93,7 +94,7 @@ std::string ISO8583Decoder::decodeBCD(const std::string& bcd) {
 std::string ISO8583Decoder::decodeMTI(const std::string& data) {
     std::string mti = decodeBCD(data);
     if (mti.size() != 4) {
-        throw std::invalid_argument("Decoded MTI must be 4 digits");
+        // throw std::invalid_argument("Decoded MTI must be 4 digits");
     }
     return mti;
 }

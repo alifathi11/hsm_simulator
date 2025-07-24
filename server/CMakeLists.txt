@@ -3,6 +3,8 @@ project(server)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(server
         main.cpp
         ServerApp.cpp
@@ -12,4 +14,12 @@ add_executable(server
         ISO8583Message.cpp
         HSMServer.cpp
         ISO8583Processor.cpp
-        Utils.cpp)
+        ../common/Utils.cpp
+        HSMCommandHandler.cpp
+        SecurityService.cpp
+        ../common/FieldMapper.cpp
+        ConfigLoader.cpp
+        SSLContext.cpp)
+
+
+target_link_libraries(server PRIVATE OpenSSL::SSL OpenSSL::Crypto)

@@ -1,6 +1,7 @@
 #include "ISO8583InputManager.h"
 #include "ISO8583Request.h"
-#include "Utils.h"
+#include "../common/Utils.h"
+
 
 ISO8583Request ISO8583InputManager::getVerifyCVV2Input() {
 
@@ -40,6 +41,7 @@ ISO8583Request ISO8583InputManager::getEncryptDataInput() {
     // build request
     ISO8583Request request;
     request.data = data;
+
 
     return request;
 }

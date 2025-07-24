@@ -9,11 +9,11 @@
 class ISO8583Builder {
 
 public:
-    ISO8583Message buildVerifyCVV2(const ISO8583Request &request);
-    ISO8583Message buildVerifyPVV(const ISO8583Request &request);
-    ISO8583Message buildEncryptُData(const ISO8583Request &request);
-    ISO8583Message buildGenerateMAC(const ISO8583Request &request);
-    ISO8583Message buildVerifyMAC(const ISO8583Request &request);
+    static ISO8583Message buildVerifyCVV2(const ISO8583Request &request);
+    static ISO8583Message buildVerifyPVV(const ISO8583Request &request);
+    static ISO8583Message buildEncryptُData(const ISO8583Request &request);
+    static ISO8583Message buildGenerateMAC(const ISO8583Request &request);
+    static ISO8583Message buildVerifyMAC(const ISO8583Request &request);
 };
 
 

@@ -6,11 +6,27 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <bits/fs_fwd.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include "SSLContext.h"
+
+HSMClientSocket::HSMClientSocket(): sslContext(SSLContext()) {
+}
 
 
-HSMClientSocket::HSMClientSocket(const std::string &serverIP, int port)
-    : serverIP(serverIP), port(port), sockfd(-1) {}
+void HSMClientSocket::setSSLCTX(SSLContext& sllContext) {
+    this->sslContext = sllContext;
+}
 
+
+void HSMClientSocket::setServerIP(const std::string& ip) {
+    this->serverIP = ip;
+}
+
+
+void HSMClientSocket::setPort(int port) {
+    this->port = port;
+}
 
 HSMClientSocket::~HSMClientSocket() {
     closeConnection();
@@ -38,18 +54,29 @@ bool HSMClientSocket::connectToServer() {
         return false;
     }
 
+    ssl = SSL_new(sslContext.getCTX());
+    SSL_set_fd(ssl, sockfd);
+
+    if (SSL_connect(ssl) <= 0) {
+        // handshake failed
+        ERR_print_errors_fp(stderr);
+        SSL_free(ssl);
+        close(sockfd);
+        return false;
+    }
+
     return true;
 
 }
 
-bool HSMClientSocket::sendMessage(const std::string &message) {
-	ssize_t byteSent = send(sockfd, message.c_str(), message.size(), 0);
+bool HSMClientSocket::sendMessage(const std::string& message) {
+	ssize_t byteSent = SSL_write(ssl, message.c_str(), message.size());
 	return byteSent == message.size();
 }
 
 std::string HSMClientSocket::receiveMessage() {
     char buffer[1024] = {0};
-    ssize_t byteReceived = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
+    ssize_t byteReceived = SSL_read(ssl, buffer, sizeof(buffer) - 1);
     if (byteReceived > 0) return std::string(buffer, byteReceived);
     else return "";
 }
@@ -61,8 +88,10 @@ bool HSMClientSocket::isConnected() {
 
 
 
-bool HSMClientSocket::closeConnection() {
+void HSMClientSocket::closeConnection() {
     if (sockfd != -1) {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
         close(sockfd);
         sockfd = -1;
     }

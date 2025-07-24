@@ -7,11 +7,11 @@
 class ISO8583InputManager {
 
 public:
-    ISO8583Request getVerifyCVV2Input();
-    ISO8583Request getVerifyPVVInput();
-    ISO8583Request getEncryptDataInput();
-    ISO8583Request getGenerateMACInput();
-    ISO8583Request getVerifyMACInput();
+    static ISO8583Request getVerifyCVV2Input();
+    static ISO8583Request getVerifyPVVInput();
+    static ISO8583Request getEncryptDataInput();
+    static ISO8583Request getGenerateMACInput();
+    static ISO8583Request getVerifyMACInput();
 };
 
 

@@ -15,15 +15,10 @@ public:
     void generateMAC();
     void verifyMAC();
 
+    void setSocket(HSMClientSocket* socket);
+
 private:
-    ISO8583InputManager inputManager;
-    ISO8583Builder builder;
-    HSMResponse hsmResponse;
-
-    std::string serverIP = "127.0.0.1";
-    int port = 12345;
-    HSMClientSocket socket = HSMClientSocket(serverIP, port);
-
+    HSMClientSocket* socket = nullptr;
 };
 
 

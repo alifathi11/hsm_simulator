@@ -1,7 +1,7 @@
 #include "ISO8583Processor.h"
 
 #include "HSMCommandHandler.h"
-#include "Utils.h"
+#include "../common/Utils.h"
 
 
 ISO8583Processor::ISO8583Processor(const std::string &rawMessage) : rawMessage(rawMessage) {}

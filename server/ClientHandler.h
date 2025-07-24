@@ -4,14 +4,17 @@
 #include <string>
 
 #include "ISO8583Processor.h"
+#include "SSLContext.h"
 
 
 class ClientHandler {
 public:
-    explicit ClientHandler(int clientSocket);
+    explicit ClientHandler(SSL* ssl);
+    ~ClientHandler();
     void operator()();
 
 private:
+    SSL* ssl;
     int clientSocket;
 
     std::optional<std::string> receiveMessage();

@@ -1,142 +1,122 @@
 #include "HSMClient.h"
 
 #include <iostream>
-#include <ostream>
-
-#include "ISO8583InputManager.h"
 #include "ISO8583Message.h"
 #include "ISO8583Request.h"
-#include "Utils.h"
+
+
+// TODO: fix bugs in packing message
+// TODO: check connection, send and receive messages
 
 
 void HSMClient::verifyCVV2() {
 
     // get inputs
-    ISO8583Request request = inputManager.getVerifyCVV2Input();
+    ISO8583Request request = ISO8583InputManager::getVerifyCVV2Input();
 
     // build ISO8583 message
-    ISO8583Message message = builder.buildVerifyCVV2(request);
+    ISO8583Message message = ISO8583Builder::buildVerifyCVV2(request);
 
     // get the message packed string
-    // TODO: fix bugs in packing message
     std::string packedMessage = message.pack();
 
-    // send to HSM server
-	if (!socket.isConnected()) {
-		socket.connectToServer();
-	}
-
-	socket.sendMessage(packedMessage);
+	// send message
+	socket->sendMessage(packedMessage);
 
 	// receive server response
-	std::string response = socket.receiveMessage();
+	std::string response = socket->receiveMessage();
 
 	// show server response
-	hsmResponse.showResponse(response);
+	HSMResponse::showResponse(response);
 }
 
 void HSMClient::verifyPVV() {
 
     // get inputs
-    ISO8583Request request = inputManager.getVerifyPVVInput();
+    ISO8583Request request = ISO8583InputManager::getVerifyPVVInput();
 
     // build ISO8583 message
-    ISO8583Message message = builder.buildVerifyPVV(request);
+    ISO8583Message message = ISO8583Builder::buildVerifyPVV(request);
 
     // get the message packed string
-    // TODO: fix bugs in packing message
     std::string packedMessage = message.pack();
 
-    // send to HSM server
-	if (!socket.isConnected()) {
-		socket.connectToServer();
-	}
-
-	socket.sendMessage(packedMessage);
+	// send message
+	socket->sendMessage(packedMessage);
 
 	// receive server response
-	std::string response = socket.receiveMessage();
+	std::string response = socket->receiveMessage();
 
 	// show server response
-	hsmResponse.showResponse(response);
+	HSMResponse::showResponse(response);
 
 }
 
 void HSMClient::encryptData() {
 
     // get inputs
-    ISO8583Request request = inputManager.getEncryptDataInput();
+    ISO8583Request request = ISO8583InputManager::getEncryptDataInput();
 
     // build ISO8583 message
-    ISO8583Message message = builder.buildEncryptُData(request);
+    ISO8583Message message = ISO8583Builder::buildEncryptُData(request);
 
     // get the message packed string
-    // TODO: fix bugs in packing message
     std::string packedMessage = message.pack();
 
-    // send to HSM server
-	if (!socket.isConnected()) {
-		socket.connectToServer();
-	}
-
-	socket.sendMessage(packedMessage);
+	// send message
+	socket->sendMessage(packedMessage);
 
 	// receive server response
-	std::string response = socket.receiveMessage();
+	std::string response = socket->receiveMessage();
 
 	// show server response
-	hsmResponse.showResponse(response);
+	HSMResponse::showResponse(response);
 
 }
 
 void HSMClient::generateMAC() {
 
     // get inputs
-    ISO8583Request request = inputManager.getGenerateMACInput();
+    ISO8583Request request = ISO8583InputManager::getGenerateMACInput();
 
     // build ISO8583 message
-    ISO8583Message message = builder.buildGenerateMAC(request);
+    ISO8583Message message = ISO8583Builder::buildGenerateMAC(request);
 
     // get the message packed string
-    // TODO: fix bugs in packing message
     std::string packedMessage = message.pack();
 
-    // send to HSM server
-	if (!socket.isConnected()) {
-		socket.connectToServer();
-	}
-
-	socket.sendMessage(packedMessage);
+	// send message
+	socket->sendMessage(packedMessage);
 
 	// receive server response
-	std::string response = socket.receiveMessage();
+	std::string response = socket->receiveMessage();
 
 	// show server response
-	hsmResponse.showResponse(response);
+	HSMResponse::showResponse(response);
 }
 
 void HSMClient::verifyMAC() {
 
     // get inputs
-    ISO8583Request request = inputManager.getVerifyMACInput();
+    ISO8583Request request = ISO8583InputManager::getVerifyMACInput();
 
     // build ISO8583 message
-    ISO8583Message message = builder.buildVerifyMAC(request);
+    ISO8583Message message = ISO8583Builder::buildVerifyMAC(request);
 
     // get the message packed string
-    // TODO: fix bugs in packing message
     std::string packedMessage = message.pack();
 
-    // send to HSM server
-	if (!socket.isConnected()) {
-		socket.connectToServer();
-	}
-
-	socket.sendMessage(packedMessage);
+	// send message
+	socket->sendMessage(packedMessage);
 
 	// receive server response
-	std::string response = socket.receiveMessage();
+	std::string response = socket->receiveMessage();
 
 	// show server response
-	hsmResponse.showResponse(response);
+	HSMResponse::showResponse(response);
 }
+
+void HSMClient::setSocket(HSMClientSocket* socket) {
+	this->socket = socket;
+}
+

@@ -1,10 +1,17 @@
 #include "ClientApp.h"
 #include <iostream>
+#include <memory>
 #include <string>
 #include <bits/ostream.tcc>
+#include <sys/socket.h>
 
 #include "HSMClient.h"
-#include "Utils.h"
+#include "../common/Utils.h"
+
+// TODO: bug in SSL_READ / SSL_WRITE
+
+std::shared_ptr<HSMClientSocket> ClientApp::socket = nullptr;
+std::shared_ptr<HSMClient> ClientApp::hsmClient = nullptr;
 
 void ClientApp::showMenu() {
     std::cout << "===== HSM Client =====" << std::endl;
@@ -17,12 +24,38 @@ void ClientApp::showMenu() {
 }
 
 void ClientApp::run() {
+
+    // initialize and connect to server
+    init();
+
+    // start main loop
     while (true) {
         showMenu();
         std::string option;
         std::cin >> option;
         handleOption(option);
     }
+}
+
+void ClientApp::init() {
+    if (!socket) {
+        socket = std::make_shared<HSMClientSocket>();
+    }
+
+    if (!hsmClient) {
+        hsmClient = std::make_shared<HSMClient>();
+    }
+
+    socket->setServerIP(serverIP);
+    socket->setPort(port);
+    socket->setSSLCTX(sslContext);
+
+    if (!socket->connectToServer()) {
+        Utils::showError("Failed to connect to server\n");
+        endProgram();
+    }
+
+    hsmClient->setSocket(socket.get());
 }
 
 
@@ -37,23 +70,21 @@ void ClientApp::handleOption(const std::string &option) {
         return;
     }
 
-    HSMClient client;
-
     switch (optionNumber) {
         case 1:
-            client.verifyCVV2();
+            hsmClient->verifyCVV2();
             break;
         case 2:
-            client.verifyPVV();
+            hsmClient->verifyPVV();
             break;
         case 3:
-            client.encryptData();
+            hsmClient->encryptData();
             break;
         case 4:
-            client.generateMAC();
+            hsmClient->generateMAC();
             break;
         case 5:
-            client.verifyMAC();
+            hsmClient->verifyMAC();
             break;
         case 6:
             endProgram();
@@ -67,5 +98,15 @@ void ClientApp::handleOption(const std::string &option) {
 
 void ClientApp::endProgram() {
     std::cout << "\nClosing the program...\n" << std::endl;
-    exit(0);
+
+    if (socket) {
+        socket->closeConnection();
+        socket.reset();
+    }
+
+    if (hsmClient) {
+        hsmClient.reset();
+    }
+
+    std::exit(0);
 }

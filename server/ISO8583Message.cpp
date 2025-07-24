@@ -9,7 +9,7 @@
 #include <string>
 
 #include "ISO8583Decoder.h"
-#include "Utils.h"
+#include "../common/Utils.h"
 
 void ISO8583Message::setMTI(const std::string& mti) {
     this->mti = mti;
@@ -79,8 +79,14 @@ std::map<int, std::string> ISO8583Message::unpack(const std::string& rawMessage)
     // extract and decode fields
     for (int fieldNumber = 2; fieldNumber <= bitmap.size(); fieldNumber++) {
         if (bitmap.test(fieldNumber - 1)) {
+            // debug
+            std::cout << "In field " << fieldNumber << ": " << bitmap.test(fieldNumber - 1) << std::endl;
             std::string rawValue = extractValue(fieldNumber, rawMessage, offset);
+            // debug
+            std::cout << "raw value " << rawValue << std::endl;
             std::string decodedValue = decodeField(fieldNumber, rawValue);
+            // debug
+            std::cout << "decoded value " << decodedValue << std::endl ;
             fields[fieldNumber] = decodedValue;
         }
     }
@@ -118,6 +124,8 @@ std::string ISO8583Message::encodeField(int fieldNumber, const std::string& valu
 }
 
 std::string ISO8583Message::decodeField(int fieldNumber, const std::string& value) {
+    // debug
+    std::cout << "Im here on decodeField" << std::endl;
     switch (fieldNumber) {
         case 2:  return ISO8583Decoder::decodePAN(value);
         case 3:  return ISO8583Decoder::decodeProcessingCode(value);

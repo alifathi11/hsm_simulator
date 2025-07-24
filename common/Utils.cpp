@@ -1,22 +1,17 @@
 #include "Utils.h"
 
 #include <iomanip>
-#include <iostream>
 
 
-std::string Utils::prompt(const std::string& message) {
-    std::cout << message + " ";
-    std::string response;
-    std::cin >> response;
-    return response;
-}
-
-
-void Utils::showMessage(const std::string &message) {
+void Utils::showMessage(const std::string& message) {
     std::cout << message << std::endl;
 }
 
-void Utils::printHex(const std::string &data) {
+void Utils::showError(const std::string& errorMessage) {
+    std::cerr << errorMessage << std::endl;
+}
+
+void Utils::printHEX(const std::string& data) {
     std::cout << "Hex Dump (" << data.size() << " bytes):" << std::endl;
     for (size_t i = 0; i < data.size(); ++i) {
         std::cout << std::hex << std::uppercase << std::setw(2) << std::setfill('0')
@@ -24,4 +19,12 @@ void Utils::printHex(const std::string &data) {
         if ((i + 1) % 16 == 0) std::cout << std::endl;
     }
     std::cout << std::dec << std::endl;
+}
+
+std::string Utils::prompt(const std::string& message) {
+    std::cout << message + " " << std::endl;
+    std::string response;
+    std::cin >> response;
+
+    return response;
 }

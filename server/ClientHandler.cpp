@@ -3,14 +3,24 @@
 #include <optional>
 #include <string>
 #include "ClientHandler.h"
+
+#include <chrono>
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
+#include <openssl/err.h>
 #include <sys/socket.h>
-#include "Utils.h"
+#include <openssl/ssl.h>
+
+#include "../common/Utils.h"
 
 
-ClientHandler::ClientHandler(int clientSocket) : clientSocket(clientSocket) {}
+ClientHandler::ClientHandler(SSL* ssl) : ssl(ssl), clientSocket(SSL_get_fd(ssl)) {}
+
+ClientHandler::~ClientHandler() {
+    closeClientSocket();
+}
+
 
 void ClientHandler::operator()() {
 
@@ -27,6 +37,10 @@ void ClientHandler::operator()() {
 
         // extract message
         std::string message = msgOpt.value();
+
+        if (message.empty()) {
+            continue;
+        }
 
         // handle the ISO8583 message and make a response
         std::string response = handleMessage(message);
@@ -48,22 +62,32 @@ std::optional<std::string> ClientHandler::receiveMessage() {
     char buffer[bufferSize];
     std::memset(buffer, 0, bufferSize);
 
-    ssize_t bytesReceived = recv(clientSocket, buffer, bufferSize - 1, 0);
+    ssize_t bytesReceived = SSL_read(ssl, buffer, bufferSize - 1);
 
     if (bytesReceived > 0) {
         return std::string(buffer, bytesReceived);
-    } else if (bytesReceived == 0) {
-        return std::nullopt;
     } else {
-        Utils::showError("error receiving data from client " + std::to_string(clientSocket));
-        return std::nullopt;
+        int sslErr = SSL_get_error(ssl, bytesReceived);
+
+        if (sslErr == SSL_ERROR_ZERO_RETURN) {
+            std::cout << "Client closed connection\n";
+            return std::nullopt;
+        } else if (sslErr == SSL_ERROR_WANT_READ || sslErr == SSL_ERROR_WANT_WRITE) {
+            return "";
+        } else {
+            ERR_print_errors_fp(stderr);
+            Utils::showError("SSL_read failed with error: " + std::to_string(sslErr));
+            return std::nullopt;
+        }
     }
 }
 
 std::string ClientHandler::handleMessage(const std::string& message) {
-    ISO8583Processor processor(message);
-    std::string response = processor.process();
-    return response;
+    return "00";
+    // TODO: implement handleMessage
+    // ISO8583Processor processor(message);
+    // std::string response = processor.process();
+    // return response;
 }
 
 bool ClientHandler::sendResponse(const std::string& response) {
@@ -73,7 +97,7 @@ bool ClientHandler::sendResponse(const std::string& response) {
 
     while (totalSent < toSend) {
         // try to send response
-        ssize_t sent = send(clientSocket, buffer + totalSent, toSend - totalSent, 0);
+        ssize_t sent = SSL_write(ssl, buffer + totalSent, toSend - totalSent);
         // check if the socket is connected
         if (sent <= 0) {
             Utils::showError("error sending response");
@@ -88,5 +112,9 @@ bool ClientHandler::sendResponse(const std::string& response) {
 
 void ClientHandler::closeClientSocket() {
     Utils::showMessage("Closing socket " + std::to_string(clientSocket));
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
     close(clientSocket);
 }
+
+

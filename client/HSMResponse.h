@@ -5,7 +5,7 @@
 
 class HSMResponse {
 public:
-    void showResponse(const std::string& response);
+    static void showResponse(const std::string& response);
 };
 
 
